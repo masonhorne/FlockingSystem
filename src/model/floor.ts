@@ -1,13 +1,7 @@
 import { vec3 } from 'gl-matrix';
 import { Drawable } from './drawable';
-import { Material } from './material';
 
-export class Floor implements Drawable {
-  private vertices: Float32Array;
-  private triangles: Uint16Array;
-  private normals: Float32Array;
-  private uvs: Float32Array;
-  private material: Material;
+export class Floor extends Drawable {
 
   /**
    * Creates a floor drawable object
@@ -29,60 +23,41 @@ export class Floor implements Drawable {
     alpha: number,
     texturePath: string | undefined
   ) {
-    this.vertices = new Float32Array([
-        position[0], position[1], position[2],
-        position[0] + size, position[1], position[2],
-        position[0] + size, position[1], position[2] + size,
-        position[0], position[1], position[2] + size,
-    ])
+    super(diffuse, specular, ambient, n, alpha, texturePath);
+    this.generateSquare(position, size);
+  }
 
+  private generateSquare(position: vec3, size: number) {
+    this.vertices = new Float32Array([
+      position[0], position[1], position[2],
+      position[0] + size, position[1], position[2],
+      position[0] + size, position[1], position[2] + size,
+      position[0], position[1], position[2] + size,
+    ])
     this.triangles = new Uint16Array([
         0, 1, 2,
         0, 2, 3,
     ]);
-    
     this.normals = new Float32Array([
       0, 1, 0,
       0, 1, 0,
       0, 1, 0,
       0, 1, 0,
     ]);
-
     this.uvs = new Float32Array([
       0, 0,
       1, 0,
       1, 1,
       0, 1,
     ]);
-
-    this.material = {
-      diffuse,
-      specular,
-      ambient,
-      n,
-      texturePath,
-      alpha,
-    };
-  }
-
-  getVertices(): Float32Array {
-    return this.vertices;
-  }
-
-  getTriangles(): Uint16Array {
-    return this.triangles;
-  }
-
-  getNormals(): Float32Array {
-    return this.normals;
-  }
-
-  getUVs(): Float32Array {
-    return this.uvs;
-  }
-
-  getMaterial() {
-    return this.material;
+    for(let i = 0; i < this.vertices.length; i += 3) {
+      this.center[0] += this.vertices[i];
+      this.center[1] += this.vertices[i + 1];
+      this.center[2] += this.vertices[i + 2];
+    }
+    this.center[0] /= this.vertices.length / 3;
+    this.center[1] /= this.vertices.length / 3;
+    this.center[2] /= this.vertices.length / 3;
   }
 }
 

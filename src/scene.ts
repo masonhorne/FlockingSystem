@@ -11,15 +11,16 @@ export class Scene {
     private aPositionLoc: GLint | undefined;
     private aNormalLoc: GLint | undefined;
     private aUVLoc: GLint | undefined;
-    private uProjectionViewMatrixLoc:  WebGLUniformLocation | null | undefined
-    private uCameraPositionLoc:  WebGLUniformLocation | null | undefined
-    private uAmbientLoc:  WebGLUniformLocation | null | undefined
-    private uDiffuseLoc:  WebGLUniformLocation | null | undefined
-    private uSpecularLoc:  WebGLUniformLocation | null | undefined
-    private uShininessLoc:  WebGLUniformLocation | null | undefined
-    private uAlphaLoc:  WebGLUniformLocation | null | undefined
-    private uUsingTextureLoc:  WebGLUniformLocation | null | undefined
-    private uTextureLoc:  WebGLUniformLocation | null | undefined
+    private uModelMatrixLoc:  WebGLUniformLocation | null | undefined;
+    private uProjectionViewMatrixLoc:  WebGLUniformLocation | null | undefined;
+    private uCameraPositionLoc:  WebGLUniformLocation | null | undefined;
+    private uAmbientLoc:  WebGLUniformLocation | null | undefined;
+    private uDiffuseLoc:  WebGLUniformLocation | null | undefined;
+    private uSpecularLoc:  WebGLUniformLocation | null | undefined;
+    private uShininessLoc:  WebGLUniformLocation | null | undefined;
+    private uAlphaLoc:  WebGLUniformLocation | null | undefined;
+    private uUsingTextureLoc:  WebGLUniformLocation | null | undefined;
+    private uTextureLoc:  WebGLUniformLocation | null | undefined;
 
     private animationFrameId: number | undefined;
   
@@ -31,7 +32,7 @@ export class Scene {
         return;
       }
       this.gl.viewport(0, 0, canvas.width, canvas.height);
-      this.gl.clearColor(1.0, 1.0, 1.0, 1.0); // UPDATE TO BLACK
+      this.gl.clearColor(0, 0, 0, 1.0);
       this.gl.clearDepth(1.0);
       this.gl.enable(this.gl.DEPTH_TEST);
       this.gl.enable(this.gl.BLEND);
@@ -82,6 +83,7 @@ export class Scene {
         attribute vec3 aPosition;
         attribute vec3 aNormal;
         attribute vec2 aUV;
+        uniform mat4 uModelMatrix;
         uniform mat4 uProjectionViewMatrix;
 
         varying vec3  vPosition;
@@ -89,11 +91,11 @@ export class Scene {
         varying vec3 vNormal;
         
         void main() {
-            vec4 vPosition4 = vec4(aPosition, 1.0);
-            vPosition = aPosition;
+            vec4 vPosition4 = uModelMatrix * vec4(aPosition, 1.0);
+            vPosition = vPosition4.xyz;
             gl_Position = uProjectionViewMatrix * vPosition4;
 
-            vec4 vNormal4 = vec4(aNormal, 0.0);
+            vec4 vNormal4 = uModelMatrix * vec4(aNormal, 0.0);
             vNormal = normalize(vec3(vNormal4.x, vNormal4.y, vNormal4.z));
 
             vUV = aUV;
@@ -196,6 +198,7 @@ export class Scene {
         this.aUVLoc = this.gl.getAttribLocation(shaderProgram, "aUV");
         this.gl.enableVertexAttribArray(this.aUVLoc);
 
+        this.uModelMatrixLoc = this.gl.getUniformLocation(shaderProgram, "uModelMatrix");
         this.uProjectionViewMatrixLoc = this.gl.getUniformLocation(shaderProgram, "uProjectionViewMatrix");
 
         this.uCameraPositionLoc = this.gl.getUniformLocation(shaderProgram, "uCameraPosition");
@@ -221,10 +224,12 @@ export class Scene {
         const projectionMatrix = this.camera.getProjectionMatrix();
         const viewMatrix = this.camera.getViewMatrix();
         const projectionViewMatrix = mat4.multiply(mat4.create(), projectionMatrix, viewMatrix);
-
+        this.gl.uniform3fv(this.uCameraPositionLoc!, this.camera.getPosition());
+        this.gl.uniformMatrix4fv(this.uProjectionViewMatrixLoc!, false, projectionViewMatrix);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-        if(!this.uProjectionViewMatrixLoc ||
+        if(!this.uModelMatrixLoc ||
+            !this.uProjectionViewMatrixLoc ||
             !this.uCameraPositionLoc ||
             !this.uAmbientLoc ||
             !this.uDiffuseLoc ||
@@ -242,7 +247,7 @@ export class Scene {
         }
 
         this.objects.forEach((object: ProcessedDrawable) => {
-            this.gl.uniformMatrix4fv(this.uProjectionViewMatrixLoc!, false, projectionViewMatrix);
+            this.gl.uniformMatrix4fv(this.uModelMatrixLoc!, false, object.getModelMatrix());
             const material = object.getMaterial();
             this.gl.uniform3fv(this.uAmbientLoc!, material.ambient);
             this.gl.uniform3fv(this.uDiffuseLoc!, material.diffuse);

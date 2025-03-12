@@ -34,96 +34,110 @@ export class Camera {
     this.viewMatrix = mat4.create();
     this.projectionMatrix = mat4.create();
     this.speed = 1;
-    this.tiltSpeed = 10;
+    this.tiltSpeed = 5;
 
     mat4.lookAt(this.viewMatrix, this.position, this.target, this.up);
     mat4.perspective(this.projectionMatrix, fov, aspect, near, far);
   }
 
-  getViewMatrix(): mat4 {
+  public getViewMatrix(): mat4 {
     return this.viewMatrix;
   }
 
-  getProjectionMatrix(): mat4 {
+  public getProjectionMatrix(): mat4 {
     return this.projectionMatrix;
   }
 
-  getPosition(): vec3 {
+  public getPosition(): vec3 {
     return this.position;
   }
 
-  moveForward() {
+  public moveForward() {
+    const forward = vec3.create();
+    vec3.sub(forward, this.target, this.position);
+    const lookAt = vec3.normalize(forward, forward);
+    vec3.add(this.target, vec3.clone(this.target), vec3.scale(forward, lookAt, this.speed));
+    vec3.add(this.position, vec3.clone(this.position), vec3.scale(forward, lookAt, this.speed));
+    this.updateViewMatrix();
+  }
+
+  public moveBackward() {
+    const forward = vec3.create();
+    vec3.sub(forward, this.target, this.position);
+    const lookAt = vec3.normalize(forward, forward);
+    vec3.sub(this.target, vec3.clone(this.target), vec3.scale(forward, lookAt, this.speed));
+    vec3.sub(this.position, vec3.clone(this.position), vec3.scale(forward, lookAt, this.speed));
+    this.updateViewMatrix();
+  }
+
+  public moveLeft() {
+    const forward = vec3.create();
+    vec3.sub(forward, this.target, this.position);
+    const lookAt = vec3.normalize(forward, forward);
+    const viewRight = vec3.normalize(vec3.create(), vec3.cross(forward, lookAt, this.up));
+    vec3.add(this.target, vec3.clone(this.target), vec3.scale(forward, viewRight, -this.speed));
+    vec3.add(this.position, vec3.clone(this.position), vec3.scale(forward, viewRight, -this.speed));
+    this.updateViewMatrix();
+  }
+
+  public moveRight() {
+    const forward = vec3.create();
+    vec3.sub(forward, this.target, this.position);
+    const lookAt = vec3.normalize(forward, forward);
+    const viewRight = vec3.normalize(vec3.create(), vec3.cross(forward, lookAt, this.up));
+    vec3.add(this.target, vec3.clone(this.target), vec3.scale(forward, viewRight, this.speed));
+    vec3.add(this.position, vec3.clone(this.position), vec3.scale(forward, viewRight, this.speed));
+    this.updateViewMatrix();
+  }
+
+
+  public tiltUp() {
     const forward = vec3.create();
     vec3.sub(forward, this.target, this.position);
     vec3.normalize(forward, forward);
-    vec3.scale(forward, forward, this.speed);
-    vec3.add(this.position, this.position, forward);
-    vec3.add(this.target, this.target, forward);
-    this.updateViewMatrix();
-  }
-
-  moveBackward() {
-    const backward = vec3.create();
-    vec3.sub(backward, this.position, this.target);
-    vec3.normalize(backward, backward);
-    vec3.scale(backward, backward, this.speed);
-    vec3.add(this.position, this.position, backward);
-    vec3.add(this.target, this.target, backward);
-    this.updateViewMatrix();
-  }
-
-  moveLeft() {
-    const left = vec3.create();
-    const forward = vec3.create();
-    vec3.sub(forward, this.target, this.position);
-    vec3.normalize(forward, forward);
-    vec3.cross(left, this.up, forward);
-    vec3.normalize(left, left);
-    vec3.scale(left, left, this.speed);
-    vec3.add(this.position, this.position, left);
-    vec3.add(this.target, this.target, left);
-    this.updateViewMatrix();
-  }
-
-  moveRight() {
     const right = vec3.create();
-    const forward = vec3.create();
-    vec3.sub(forward, this.target, this.position);
-    vec3.normalize(forward, forward);
     vec3.cross(right, forward, this.up);
     vec3.normalize(right, right);
-    vec3.scale(right, right, this.speed);
-    vec3.add(this.position, this.position, right);
-    vec3.add(this.target, this.target, right);
+    const rotationMatrix = mat4.create();
+    mat4.fromRotation(rotationMatrix, this.tiltSpeed * Math.PI / 180, right);
+    vec3.transformMat4(forward, forward, rotationMatrix);
+    vec3.add(this.target, this.position, forward);
     this.updateViewMatrix();
   }
 
-
-  tiltUp() {
+  public tiltDown() {
+    const forward = vec3.create();
+    vec3.sub(forward, this.target, this.position);
+    vec3.normalize(forward, forward);
+    const right = vec3.create();
+    vec3.cross(right, forward, this.up);
+    vec3.normalize(right, right);
     const rotationMatrix = mat4.create();
-    mat4.rotateX(rotationMatrix, rotationMatrix, this.tiltSpeed * Math.PI / 180);
-    vec3.transformMat4(this.target, this.target, rotationMatrix);
+    mat4.fromRotation(rotationMatrix, -this.tiltSpeed * Math.PI / 180, right);
+    vec3.transformMat4(forward, forward, rotationMatrix);
+    vec3.add(this.target, this.position, forward);
     this.updateViewMatrix();
   }
 
-  tiltDown() {
+  public tiltLeft() {
+    const forward = vec3.create();
+    vec3.sub(forward, this.target, this.position);
+    vec3.normalize(forward, forward);
     const rotationMatrix = mat4.create();
-    mat4.rotateX(rotationMatrix, rotationMatrix, -this.tiltSpeed * Math.PI / 180);
-    vec3.transformMat4(this.target, this.target, rotationMatrix);
+    mat4.fromRotation(rotationMatrix, this.tiltSpeed * Math.PI / 180, this.up);
+    vec3.transformMat4(forward, forward, rotationMatrix);
+    vec3.add(this.target, this.position, forward);
     this.updateViewMatrix();
   }
 
-  tiltLeft() {
+  public tiltRight() {
+    const forward = vec3.create();
+    vec3.sub(forward, this.target, this.position);
+    vec3.normalize(forward, forward);
     const rotationMatrix = mat4.create();
-    mat4.rotateY(rotationMatrix, rotationMatrix, this.tiltSpeed * Math.PI / 180);
-    vec3.transformMat4(this.target, this.target, rotationMatrix);
-    this.updateViewMatrix();
-  }
-
-  tiltRight() {
-    const rotationMatrix = mat4.create();
-    mat4.rotateY(rotationMatrix, rotationMatrix, -this.tiltSpeed * Math.PI / 180);
-    vec3.transformMat4(this.target, this.target, rotationMatrix);
+    mat4.fromRotation(rotationMatrix, -this.tiltSpeed * Math.PI / 180, this.up);
+    vec3.transformMat4(forward, forward, rotationMatrix);
+    vec3.add(this.target, this.position, forward);
     this.updateViewMatrix();
   }
 
