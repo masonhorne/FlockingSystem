@@ -1,17 +1,41 @@
 import { vec3 } from "gl-matrix";
 import { Planet } from "../model/planet";
+import { Settings } from "../settings";
+
+const MASS_OF_SUN = 10;
+const WIND_WEIGHT = 100;
+const ORBIT_WEIGHT = 1000000;
+const MAX_DISTANCE = 5;
 
 export class Particle {
     private position: vec3;
+    private velocity: vec3;
+    private centerPoint: vec3;
+    private acceleration: vec3;
     private radius: number;
+    private mass: number;
     private planetModel: Planet;
+    private settings: Settings = Settings.getInstance();
+    private reverse: boolean = false;
 
-    constructor(position: vec3, radius: number) {
-        this.position = position;
+    constructor(position: vec3, radius: number, centerPoint: vec3) {
+        this.position = vec3.clone(position);
         this.radius = radius;
+        this.centerPoint = centerPoint;
+        const toSun = vec3.negate(vec3.create(), position);
+        const up = vec3.fromValues(0, 1, 0);
+        this.velocity = vec3.cross(vec3.create(), toSun, up);
+        if(Math.random() < 0.5) {
+            this.reverse = true;
+            vec3.negate(this.velocity, this.velocity);
+        }
+        this.acceleration = vec3.fromValues(0, 0, 0);
+        const volume = 4 / 3 * Math.PI * Math.pow(this.radius, 3);
+        const density = Math.random();
+        this.mass = volume * density;
         const randomColor = vec3.fromValues(Math.random(), Math.random(), Math.random());
         this.planetModel = new Planet(
-            position,
+            this.position,
             radius,
             randomColor,
             randomColor,
@@ -22,7 +46,75 @@ export class Particle {
         );
     }
 
+    public applyGravity(other: Particle | vec3) {
+        const isParticle = other instanceof Particle;
+        const otherPosition = isParticle ? other.getPosition() : other;
+        const direction = vec3.subtract(vec3.create(), otherPosition, this.position);
+        const distance = vec3.length(direction);
+        if(distance < 1) return;
+        vec3.normalize(direction, direction);
+        const massOther = isParticle ? other.getMass() : MASS_OF_SUN;
+        const gravitationalCoefficient = this.settings.getSettings().gravitationalCoefficient;
+        const gravitationalForce = (gravitationalCoefficient * this.mass * massOther) / (distance * distance);
+        const gravitationalAcceleration = vec3.scale(vec3.create(), direction, gravitationalForce / this.mass);
+        vec3.add(this.acceleration, this.acceleration, gravitationalAcceleration);
+    }
+
+    public applyWind() {
+        const wind = vec3.fromValues(
+            this.settings.getSettings().windX,
+            0,
+            this.settings.getSettings().windZ,
+        );
+        vec3.scale(wind, wind, WIND_WEIGHT);
+        vec3.add(this.acceleration, this.acceleration, wind);
+    }
+    
+
+    public update(deltaTime: number) {
+        // Orbit movement
+        const toCenter = vec3.subtract(vec3.create(), this.centerPoint, this.position);
+        const toCenterNormalized = vec3.normalize(vec3.create(), toCenter);
+        const tangent = vec3.cross(vec3.create(), toCenterNormalized, vec3.fromValues(0, 1, 0));
+        if(this.reverse) vec3.negate(tangent, tangent);
+        vec3.normalize(tangent, tangent);
+        const velocityLength = vec3.length(this.velocity);
+        const desiredVelocity = vec3.scale(vec3.create(), tangent, velocityLength);
+        const steer = vec3.subtract(vec3.create(), desiredVelocity, this.velocity);
+        vec3.scale(steer, steer, ORBIT_WEIGHT);
+        vec3.add(this.velocity, this.velocity, steer);
+    
+        // Gravity/Wind movement
+        const velocityChange = vec3.scale(vec3.create(), this.acceleration, deltaTime);
+        vec3.add(this.velocity, this.velocity, velocityChange);
+    
+        const maxSpeed = this.settings.getSettings().maxSpeed;
+        if (vec3.length(this.velocity) > maxSpeed) {
+            vec3.normalize(this.velocity, this.velocity);
+            vec3.scale(this.velocity, this.velocity, maxSpeed);
+        }
+        const positionChange = vec3.scale(vec3.create(), this.velocity, deltaTime);
+        vec3.add(this.position, this.position, positionChange);
+        for (let i of [0, 2]) {
+            if (this.position[i] < -MAX_DISTANCE || this.position[i] > MAX_DISTANCE) {
+                this.position[i] = Math.max(-MAX_DISTANCE, Math.min(MAX_DISTANCE, this.position[i]));
+                this.velocity[i] = 0;
+            }
+        }
+        this.planetModel.setTranslation(vec3.fromValues(this.position[0], 0, this.position[2]));
+        vec3.set(this.acceleration, 0, 0, 0);
+    }
+    
+
     public getModel(): Planet {
         return this.planetModel;
+    }
+
+    public getPosition(): vec3 {
+        return this.position;
+    }
+
+    public getMass(): number {
+        return this.mass;
     }
 }

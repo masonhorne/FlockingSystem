@@ -2,8 +2,11 @@ import { vec3 } from 'gl-matrix';
 import { Camera } from './camera';
 import { Floor } from './model/floor';
 import { Planet } from './model/planet';
-import { ParticleGenerator } from './particles/particlegenerator';
+import { ParticleSystem } from './particles/particlesystem';
 import { Scene } from './scene';
+import { UiHandler } from './uihandler';
+
+const center = vec3.fromValues(0, 1, 0);
 
 const floor = new Floor(
     vec3.fromValues(-10, 0, -10),
@@ -18,7 +21,7 @@ const floor = new Floor(
 
 
 const sun = new Planet(
-    vec3.fromValues(0, 1, 0),
+    center,
     1,
     vec3.fromValues(1, 1, 0),
     vec3.fromValues(.1, .1, .1),
@@ -29,7 +32,8 @@ const sun = new Planet(
 )
 
 const camera = new Camera(
-    vec3.fromValues(-25, 10, -25),
+    vec3.fromValues(-25, 25, -25), // ISOMETRIC VIEW
+    // vec3.fromValues(1, 40, 0), // TOP DOWN VIEW
     vec3.fromValues(0, 0, 0),
     vec3.fromValues(0, 1, 0),
     Math.PI / 4,
@@ -39,7 +43,7 @@ const camera = new Camera(
 )
 
 const light = {
-    position: vec3.fromValues(0, 1, 0),
+    position: center,
     diffuse: vec3.fromValues(1, 1, 1),
     specular: vec3.fromValues(1, 1, 1),
     ambient: vec3.fromValues(1, 1, 1),
@@ -64,35 +68,8 @@ scene.addLight(light2);
 scene.addObject(floor);
 scene.addObject(sun);
 
-const particles = ParticleGenerator.generateParticles(10, vec3.fromValues(0, 1, 0));
+const particleSystem = new ParticleSystem(50, center);
+const particles = particleSystem.getParticles();
 particles.forEach(particle => scene.addObject(particle.getModel()));
 
-function handleKeyDown(event: KeyboardEvent) {
-    switch (event.key) {
-        case "w":
-            camera.moveForward();
-            break;
-        case "W":
-            camera.tiltUp();
-            break;
-        case "s":
-            camera.moveBackward();
-            break;
-        case "S":
-            camera.tiltDown();
-            break;
-        case "a":
-            camera.moveLeft();
-            break;
-        case "A":
-            camera.tiltLeft();
-            break;
-        case "d":
-            camera.moveRight();
-            break;
-        case "D":
-            camera.tiltRight();
-            break;
-    }
-}
-document.onkeydown = handleKeyDown;
+const uiHandler = new UiHandler(camera);

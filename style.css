@@ -27,5 +27,69 @@ h1 {
 #canvas {
     border: 1px solid white;
     display: block;
+    margin: 0 64px;
+}
+
+.container {
+    display: flex;
+    align-items: flex-start;
+}
+
+.settings {
+    margin: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.setting-value {
+    text-align: center;
+    font-size: 2em;
+    color: #999;
+    font-weight: 400;
+}
+
+.range {
+    width: 100%;
+    height: 15px;
+    appearance: none;
+    background: #111;
+    outline: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 1);
+}
+
+.range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #d3d3d3;
+    cursor: pointer;
+    border: 4px solid #333;
+    box-shadow: -407px 0 0 400px #d3d3d3;
+}
+
+.vertical-slider {
+    transform: rotate(270deg) translateX(-68px);
     margin: 0 auto;
+}
+
+.vertical-slider-container { 
+    height: 150px;
+}
+
+.wind-settings {
+    display: flex;
+    flex-direction: row;
+    margin-top: 8px;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.wind-settings > .setting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

@@ -10,7 +10,45 @@
     <header>
         <h1>Flocking System</h1>
     </header>
-    <canvas id="canvas" width="512" height="512"></canvas>
+    <div class="container">
+        <canvas id="canvas" width="512" height="512"></canvas>
+        <div class="settings">
+            <div class="setting">
+                <h2 class="setting-label">Gravity Coefficient</h2>
+                <span class="setting-value" id="gravityValue">0</span>
+                <div>
+                    <input class="range" type="range" name="gravity" 
+                        min="-10" max="10" step="0.1" value="0" id="gravitySlider">
+                </div>
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Max Speed</h2>
+                <span class="setting-value" id="maxSpeedValue">0</span>
+                <div>
+                    <input class="range" type="range" name="maxSpeed" 
+                        min="0.0001" max="0.1" step="0.0001" value="0.001" id="maxSpeedSlider">
+                </div>
+            </div>
+            <div class="wind-settings">
+                <div class="setting">
+                    <h2 class="setting-label">Wind (x-axis)</h2>
+                    <div class="vertical-slider-container">
+                        <input class="range vertical-slider" type="range" name="windX" 
+                            min="-10" max="10" step="0.1" value="0" id="windXSlider">
+                    </div>
+                    <span class="setting-value" id="windXValue">0</span>
+                </div>
+                <div class="setting">
+                    <h2 class="setting-label">Wind (z-axis)</h2>
+                    <div class="vertical-slider-container">
+                        <input class="range vertical-slider" type="range" name="windZ" 
+                            min="-10" max="10" step="0.1" value="0" id="windZSlider">
+                    </div>
+                    <span class="setting-value" id="windZValue">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="module" src="dist/script.js"></script>
 </body>
 </html>
