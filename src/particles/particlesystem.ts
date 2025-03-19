@@ -55,6 +55,10 @@ export class ParticleSystem {
         for(const particle1 of this.particles) {
             for(const particle2 of this.particles) {
                 if(particle1 === particle2) continue;
+                if(particle1.intersects(particle2)) {
+                    particle1.kill();
+                    particle2.kill();
+                }
                 particle1.applyGravity(particle2);
             }
             particle1.applyGravity(this.centerPoint);

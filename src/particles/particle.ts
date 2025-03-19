@@ -19,6 +19,9 @@ export class Particle {
     private model!: Drawable; // Model will be set in the constructors call to setupModel
     private settings: Settings = Settings.getInstance();
     private reverse: boolean = false;
+    private minBounds: vec3 = vec3.fromValues(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+    private maxBounds: vec3 = vec3.fromValues(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
+    private isDead: boolean = false;
 
     constructor(position: vec3, radius: number, centerPoint: vec3) {
         this.position = vec3.clone(position);
@@ -65,6 +68,13 @@ export class Particle {
                 undefined,
             );
         }
+        // Find the bounds for the particle based on the models vertices
+        const vertices = this.model.getVertices();
+        for (let i = 0; i < vertices.length; i += 3) {
+            const vertex = vec3.fromValues(vertices[i], vertices[i + 1], vertices[i + 2]);
+            vec3.min(this.minBounds, this.minBounds, vertex);
+            vec3.max(this.maxBounds, this.maxBounds, vertex);
+        }
     }
 
     public applyGravity(other: Particle | vec3) {
@@ -93,6 +103,7 @@ export class Particle {
     
 
     public update(deltaTime: number) {
+        if(this.isDead) return;
         // Orbit movement
         const toCenter = vec3.subtract(vec3.create(), this.centerPoint, this.position);
         const toCenterNormalized = vec3.normalize(vec3.create(), toCenter);
@@ -137,5 +148,28 @@ export class Particle {
 
     public getMass(): number {
         return this.mass;
+    }
+
+    public getBounds() {
+        const translation = vec3.fromValues(this.position[0], this.position[1], this.position[2]);
+        const worldSpaceMin = vec3.add(vec3.create(), this.minBounds, translation);
+        const worldSpaceMax = vec3.add(vec3.create(), this.maxBounds, translation);
+        return {
+            min: worldSpaceMin,
+            max: worldSpaceMax,
+        }
+    }
+
+    public intersects(other: Particle): boolean {
+        const otherBounds = other.getBounds();
+        const thisBounds = this.getBounds();
+        const intersectsX = thisBounds.min[0] < otherBounds.max[0] && thisBounds.max[0] > otherBounds.min[0];
+        const intersectsY = thisBounds.min[1] < otherBounds.max[1] && thisBounds.max[1] > otherBounds.min[1];
+        const intersectsZ = thisBounds.min[2] < otherBounds.max[2] && thisBounds.max[2] > otherBounds.min[2];
+        return intersectsX && intersectsY && intersectsZ;
+    }
+
+    public kill() {
+        this.isDead = true;
     }
 }
