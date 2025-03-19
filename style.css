@@ -93,3 +93,31 @@ h1 {
     flex-direction: column;
     align-items: center;
 }
+
+.file-input {
+    margin-top: 4px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.file-input::file-selector-button {
+    border-radius: 3px;
+    padding: 0 16px;
+    height: 40px;
+    cursor: pointer;
+    background-color: rgb(139, 130, 130);
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+    color: white;
+    margin-right: 16px;
+    transition: background-color 200ms;
+}
+  
+.file-input::file-selector-button:hover {
+    background-color: #c1c3c8;
+}
+  
+.file-input::file-selector-button:active {
+    background-color: #e5e7eb;
+}

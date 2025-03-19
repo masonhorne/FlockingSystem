@@ -1,8 +1,11 @@
+import { ObjModelParams } from "./model/objprocessor";
+
 type SettingsValue = {
     gravitationalCoefficient: number;
     maxSpeed: number;
     windX: number;
     windZ: number;
+    customModelData: ObjModelParams | undefined;
 }
 
 export class Settings {
@@ -13,6 +16,7 @@ export class Settings {
         maxSpeed: 0.001,
         windX: 0,
         windZ: 0,
+        customModelData: undefined,
     };
 
     private constructor() {}

@@ -1,15 +1,19 @@
 import { Camera } from "./camera";
+import { ObjProcessor } from "./model/objprocessor";
 import { Settings } from "./settings";
 
 export class UiHandler {
     private settings: Settings;
     private camera: Camera;
+    private resetSceneCallback: () => void;
 
-    constructor(camera: Camera) {
+    constructor(camera: Camera, resetSceneCallback: () => void) {
         this.settings = Settings.getInstance();
         this.camera = camera;
+        this.resetSceneCallback = resetSceneCallback;
         this.initializeSliders();
         this.initializeKeyControls();
+        this.initializeObjUpload();
     }
 
     private initializeSliders() {
@@ -61,5 +65,26 @@ export class UiHandler {
                 case "D": this.camera.tiltRight(); break;
             }
         });
+    }
+
+    private initializeObjUpload() {
+        const objFileInput = document.getElementById('objFileUpload') as HTMLInputElement;
+        if (objFileInput) {
+            objFileInput.addEventListener('change', () => {
+                if (objFileInput.files && objFileInput.files[0]) {
+                    const file = objFileInput.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const objData = e.target?.result as string;
+                        this.settings.getSettings().customModelData = ObjProcessor.processObj(objData);
+                        this.resetSceneCallback();
+                    };
+                    reader.readAsText(file);
+                } else {
+                    this.settings.getSettings().customModelData = undefined;
+                    this.resetSceneCallback();
+                }
+            });
+        }
     }
 }

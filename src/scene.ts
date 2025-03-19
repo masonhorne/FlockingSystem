@@ -270,5 +270,11 @@ export class Scene {
             this.gl.drawElements(this.gl.TRIANGLES, object.getTriangles().length, this.gl.UNSIGNED_SHORT, 0);
         });
     }
-  }
+
+    public destroy(): void {
+        if(this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+    }
+}
   

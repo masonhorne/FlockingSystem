@@ -1,4 +1,6 @@
 import { vec3 } from "gl-matrix";
+import { Drawable } from "../model/drawable";
+import { Obj } from "../model/obj";
 import { Planet } from "../model/planet";
 import { Settings } from "../settings";
 
@@ -14,7 +16,7 @@ export class Particle {
     private acceleration: vec3;
     private radius: number;
     private mass: number;
-    private planetModel: Planet;
+    private model!: Drawable; // Model will be set in the constructors call to setupModel
     private settings: Settings = Settings.getInstance();
     private reverse: boolean = false;
 
@@ -33,17 +35,36 @@ export class Particle {
         const volume = 4 / 3 * Math.PI * Math.pow(this.radius, 3);
         const density = Math.random();
         this.mass = volume * density;
+        this.setupModel(this.position, radius);
+    }
+
+    private setupModel(position: vec3, radius: number) {
         const randomColor = vec3.fromValues(Math.random(), Math.random(), Math.random());
-        this.planetModel = new Planet(
-            this.position,
-            radius,
-            randomColor,
-            randomColor,
-            randomColor,
-            10,
-            1,
-            undefined,
-        );
+        const objData = this.settings.getSettings().customModelData;
+        if(objData) {
+            this.model = new Obj(
+                objData,
+                radius,
+                position,
+                randomColor,
+                randomColor,
+                randomColor,
+                10,
+                1,
+                undefined,
+            )
+        } else {
+            this.model = new Planet(
+                position,
+                radius,
+                randomColor,
+                randomColor,
+                randomColor,
+                10,
+                1,
+                undefined,
+            );
+        }
     }
 
     public applyGravity(other: Particle | vec3) {
@@ -101,13 +122,13 @@ export class Particle {
                 this.velocity[i] = 0;
             }
         }
-        this.planetModel.setTranslation(vec3.fromValues(this.position[0], 0, this.position[2]));
+        this.model.setTranslation(vec3.fromValues(this.position[0], 0, this.position[2]));
         vec3.set(this.acceleration, 0, 0, 0);
     }
     
 
-    public getModel(): Planet {
-        return this.planetModel;
+    public getModel(): Drawable {
+        return this.model;
     }
 
     public getPosition(): vec3 {

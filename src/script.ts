@@ -56,13 +56,9 @@ const light2 = {
     ambient: vec3.fromValues(1, 1, 1),
 }
 
-const canvas = document.getElementById('canvas');
+const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
-if (!(canvas instanceof HTMLCanvasElement)) {
-    throw new Error("Canvas not found");
-}
-
-const scene = new Scene(canvas, camera);
+var scene = new Scene(canvas, camera);
 scene.addLight(light);
 scene.addLight(light2);
 scene.addObject(floor);
@@ -72,4 +68,16 @@ const particleSystem = new ParticleSystem(50, center);
 const particles = particleSystem.getParticles();
 particles.forEach(particle => scene.addObject(particle.getModel()));
 
-const uiHandler = new UiHandler(camera);
+function resetSceneCallback() {
+    scene.destroy();
+    scene = new Scene(canvas, camera);
+    scene.addLight(light);
+    scene.addLight(light2);
+    scene.addObject(floor);
+    scene.addObject(sun);
+    const particleSystem = new ParticleSystem(50, center);
+    const particles = particleSystem.getParticles();
+    particles.forEach(particle => scene.addObject(particle.getModel()));
+}
+
+const uiHandler = new UiHandler(camera, resetSceneCallback);
