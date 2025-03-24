@@ -1,4 +1,5 @@
 import { vec3 } from 'gl-matrix';
+import { Settings } from '../settings';
 import { Particle } from './particle';
 
 
@@ -6,6 +7,7 @@ export class ParticleSystem {
     private particles: Particle[];
     private centerPoint: vec3;
     private lastAnimationTime: number = 0;
+    private settings: Settings = Settings.getInstance();
 
     constructor(totalParticles: number, centerPoint: vec3) {
         this.centerPoint = centerPoint;
@@ -37,7 +39,9 @@ export class ParticleSystem {
                 const x = centerPoint[0] + randomRadius * Math.cos(randomAngle);
                 const z = centerPoint[2] + randomRadius * Math.sin(randomAngle);
                 const position = vec3.fromValues(x, centerPoint[1], z);
-                const radius = Math.random() * 0.3 + 0.2; 
+                const radius = this.settings.getSettings().randomSize ? 
+                    Math.random() * 0.4 + 0.2 
+                    : this.settings.getSettings().particleSize;
                 particles.push(new Particle(position, radius, centerPoint));
                 particleCount++;
             }
@@ -55,7 +59,7 @@ export class ParticleSystem {
         for(const particle1 of this.particles) {
             for(const particle2 of this.particles) {
                 if(particle1 === particle2) continue;
-                if(particle1.intersects(particle2)) {
+                if(this.settings.getSettings().particleCollisions && particle1.intersects(particle2)) {
                     particle1.kill();
                     particle2.kill();
                 }

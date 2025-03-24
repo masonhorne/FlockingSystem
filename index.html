@@ -11,7 +11,6 @@
         <h1>Flocking System</h1>
     </header>
     <div class="container">
-        <canvas id="canvas" width="512" height="512"></canvas>
         <div class="settings">
             <div class="setting">
                 <h2 class="setting-label">Gravity Coefficient</h2>
@@ -50,6 +49,51 @@
             <div class="setting">
                 <h2 class="setting-label">Upload Custom Model (.obj)</h2>
                 <input type="file" class="file-input" id="objFileUpload" accept=".obj" />
+            </div>
+        </div>
+        <canvas id="canvas" width="512" height="512"></canvas>
+        <div class="settings">
+            <div class="setting">
+                <h2 class="setting-label">Particle Color</h2>
+                <div class="resetable-slider-value">
+                    <input class="color-input" type="color" id="particleColor" value="#FFFFFF">
+                    <button class="btn" id="clearColorBtn">Clear color</button>
+                </div>
+                <div class="checkbox-wrapper">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="randomColorCheckbox" checked>
+                      <div class="checkmark"></div>
+                    </label>
+                    <span>Random color</span>
+                </div>
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Particle Size</h2>
+                <div class="resetable-slider-value">
+                    <span class="setting-value" id="particleSizeValue">0</span>
+                    <button class="btn" id="clearSizeBtn">Clear size</button>
+                </div>
+                <div>
+                    <input class="range" type="range" name="particleSize" 
+                        min="0.01" max="1" step="0.01" value="0.2" id="particleSizeSlider">
+                </div>
+                <div class="checkbox-wrapper">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="randomSizeCheckbox" checked>
+                      <div class="checkmark"></div>
+                    </label>
+                    <span>Random size</span>
+                </div>
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Particle Collisions</h2>
+                <div class="checkbox-wrapper">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="collisionsCheckbox">
+                      <div class="checkmark"></div>
+                    </label>
+                    <span>Enable collisions</span>
+                </div>  
             </div>
         </div>
     </div>

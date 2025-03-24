@@ -42,16 +42,18 @@ export class Particle {
     }
 
     private setupModel(position: vec3, radius: number) {
-        const randomColor = vec3.fromValues(Math.random(), Math.random(), Math.random());
+        const color = this.settings.getSettings().randomColor ?
+            vec3.fromValues(Math.random(), Math.random(), Math.random())
+            : this.settings.getSettings().particleColor;
         const objData = this.settings.getSettings().customModelData;
         if(objData) {
             this.model = new Obj(
                 objData,
-                radius,
+                radius * 10,
                 position,
-                randomColor,
-                randomColor,
-                randomColor,
+                color,
+                color,
+                color,
                 10,
                 1,
                 undefined,
@@ -60,9 +62,9 @@ export class Particle {
             this.model = new Planet(
                 position,
                 radius,
-                randomColor,
-                randomColor,
-                randomColor,
+                color,
+                color,
+                color,
                 10,
                 1,
                 undefined,
@@ -163,10 +165,10 @@ export class Particle {
     public intersects(other: Particle): boolean {
         const otherBounds = other.getBounds();
         const thisBounds = this.getBounds();
-        const intersectsX = thisBounds.min[0] < otherBounds.max[0] && thisBounds.max[0] > otherBounds.min[0];
-        const intersectsY = thisBounds.min[1] < otherBounds.max[1] && thisBounds.max[1] > otherBounds.min[1];
-        const intersectsZ = thisBounds.min[2] < otherBounds.max[2] && thisBounds.max[2] > otherBounds.min[2];
-        return intersectsX && intersectsY && intersectsZ;
+        const xIntersect = Math.min(thisBounds.max[0], otherBounds.max[0]) - Math.max(thisBounds.min[0], otherBounds.min[0]);
+        const yIntersect = Math.min(thisBounds.max[1], otherBounds.max[1]) - Math.max(thisBounds.min[1], otherBounds.min[1]);
+        const zIntersect = Math.min(thisBounds.max[2], otherBounds.max[2]) - Math.max(thisBounds.min[2], otherBounds.min[2]);
+        return xIntersect > 0 && yIntersect > 0 && zIntersect > 0;
     }
 
     public kill() {

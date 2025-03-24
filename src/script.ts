@@ -59,14 +59,6 @@ const light2 = {
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
 var scene = new Scene(canvas, camera);
-scene.addLight(light);
-scene.addLight(light2);
-scene.addObject(floor);
-scene.addObject(sun);
-
-const particleSystem = new ParticleSystem(50, center);
-const particles = particleSystem.getParticles();
-particles.forEach(particle => scene.addObject(particle.getModel()));
 
 function resetSceneCallback() {
     scene.destroy();
@@ -80,4 +72,5 @@ function resetSceneCallback() {
     particles.forEach(particle => scene.addObject(particle.getModel()));
 }
 
+resetSceneCallback();
 const uiHandler = new UiHandler(camera, resetSceneCallback);

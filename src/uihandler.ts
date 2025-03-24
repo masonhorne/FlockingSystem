@@ -1,6 +1,8 @@
+import { vec3 } from "gl-matrix";
 import { Camera } from "./camera";
+import { debounce } from './debounce';
 import { ObjProcessor } from "./model/objprocessor";
-import { Settings } from "./settings";
+import { DEFAULT_PARTICLE_COLOR, DEFAULT_PARTICLE_SIZE, Settings } from "./settings";
 
 export class UiHandler {
     private settings: Settings;
@@ -10,10 +12,47 @@ export class UiHandler {
     constructor(camera: Camera, resetSceneCallback: () => void) {
         this.settings = Settings.getInstance();
         this.camera = camera;
-        this.resetSceneCallback = resetSceneCallback;
+        this.resetSceneCallback = debounce(resetSceneCallback, 100);
         this.initializeSliders();
         this.initializeKeyControls();
         this.initializeObjUpload();
+        this.initializeColorPicker();
+        this.initializeButtons();
+        this.initializeCheckboxes();
+    }
+
+    private initializeButtons() {
+        this.setupButton('clearSizeBtn', () => {
+            const sizeSlider = document.getElementById('particleSizeSlider') as HTMLInputElement;
+            const sizeDisplay = document.getElementById('particleSizeValue');
+            if(sizeSlider && sizeDisplay)   {
+                sizeDisplay.innerText = DEFAULT_PARTICLE_SIZE.toString();
+                sizeSlider.value = DEFAULT_PARTICLE_SIZE.toString();
+            }
+            this.settings.getSettings().particleSize = DEFAULT_PARTICLE_SIZE;
+            if(!this.settings.getSettings().randomSize) this.resetSceneCallback();
+        });
+        this.setupButton('clearColorBtn', () => {
+            const colorPicker = document.getElementById('particleColor') as HTMLInputElement;
+            this.settings.getSettings().particleColor = DEFAULT_PARTICLE_COLOR;
+            colorPicker.value = '#FFFFFF';
+            if(!this.settings.getSettings().randomColor) this.resetSceneCallback();
+        });
+    }
+
+    private initializeCheckboxes() {
+        this.setupCheckbox('randomSizeCheckbox', (checked) => {
+            this.settings.getSettings().randomSize = checked;
+            this.resetSceneCallback();
+        });
+        this.setupCheckbox('randomColorCheckbox', (checked) => {
+            this.settings.getSettings().randomColor = checked;
+            this.resetSceneCallback();
+        });
+        this.setupCheckbox('collisionsCheckbox', (checked) => {
+            this.settings.getSettings().particleCollisions = checked;
+            this.resetSceneCallback();
+        });
     }
 
     private initializeSliders() {
@@ -36,6 +75,15 @@ export class UiHandler {
             this.settings.getSettings().maxSpeed = value;
             return value.toString();
         });
+        this.setupSlider("particleSizeSlider", "particleSizeValue", (value) => {
+            const lastValue = this.settings.getSettings().particleSize;
+            this.settings.getSettings().particleSize = value;
+            const settingValue = this.settings.getSettings();
+            if(!settingValue.randomSize && lastValue !== settingValue.particleSize) {
+                this.resetSceneCallback();
+            }
+            return value.toString();
+        });
     }
 
     private setupSlider(sliderId: string, valueId: string, onChange: (value: number) => string) {
@@ -50,6 +98,16 @@ export class UiHandler {
             slider.onmousemove = (event) => update(parseFloat((event.target as HTMLInputElement).value));
             update(parseFloat(slider.value));
         }
+    }
+
+    private setupButton(buttonId: string, onClick: () => void) {
+        const button = document.getElementById(buttonId) as HTMLButtonElement;
+        if(button) button.addEventListener('click', onClick);
+    }
+
+    private setupCheckbox(checkboxId: string, onChange: (checked: boolean) => void) {
+        const checkbox = document.getElementById(checkboxId) as HTMLInputElement;
+        if(checkbox) checkbox.addEventListener('change', (event) => onChange((event.target as HTMLInputElement).checked));
     }
 
     private initializeKeyControls() {
@@ -84,6 +142,20 @@ export class UiHandler {
                     this.settings.getSettings().customModelData = undefined;
                     this.resetSceneCallback();
                 }
+            });
+        }
+    }
+
+    private initializeColorPicker() {
+        const colorPicker = document.getElementById('particleColor') as HTMLInputElement;
+        if (colorPicker) {
+            colorPicker.addEventListener('input', (event) => {
+                const selectedColor = (event.target as HTMLInputElement).value;
+                const r = parseInt(selectedColor.slice(1, 3), 16) / 255;
+                const g = parseInt(selectedColor.slice(3, 5), 16) / 255;
+                const b = parseInt(selectedColor.slice(5, 7), 16) / 255;
+                this.settings.getSettings().particleColor = vec3.fromValues(r, g, b);
+                if(!this.settings.getSettings().randomColor) this.resetSceneCallback();
             });
         }
     }
