@@ -80,6 +80,9 @@ export abstract class Drawable {
     getMaterial(): Material {
         return this.material;
     }
+    setMaterial(material: Material): void {
+        this.material = material;
+    }
 }
 
 

@@ -3,6 +3,7 @@ import { Drawable } from "../model/drawable";
 import { Obj } from "../model/obj";
 import { Planet } from "../model/planet";
 import { Settings } from "../settings";
+import { ParticleObserver } from "./observers/particleobserver";
 
 const MASS_OF_SUN = 10;
 const WIND_WEIGHT = 100;
@@ -22,6 +23,9 @@ export class Particle {
     private minBounds: vec3 = vec3.fromValues(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
     private maxBounds: vec3 = vec3.fromValues(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
     private isDead: boolean = false;
+    private collided: boolean = false;
+    private observers: ParticleObserver[] = [];
+    private lifeTime: number;
 
     constructor(position: vec3, radius: number, centerPoint: vec3) {
         this.position = vec3.clone(position);
@@ -38,6 +42,7 @@ export class Particle {
         const volume = 4 / 3 * Math.PI * Math.pow(this.radius, 3);
         const density = Math.random();
         this.mass = volume * density;
+        this.lifeTime = 1000 + Math.random() * 10000 * this.mass;
         this.setupModel(this.position, radius);
     }
 
@@ -93,6 +98,23 @@ export class Particle {
         vec3.add(this.acceleration, this.acceleration, gravitationalAcceleration);
     }
 
+    public addObserver(observer: ParticleObserver) {
+        this.observers.push(observer);
+    }
+
+    public removeObserver(observer: ParticleObserver) {
+        const index = this.observers.indexOf(observer);
+        if (index > -1) {
+            this.observers.splice(index, 1);
+        }
+    }
+
+    private notifyObservers() {
+        for(const observer of this.observers) {
+            observer.handleParticleDeath(this);
+        }
+    }
+
     public applyWind() {
         const wind = vec3.fromValues(
             this.settings.getSettings().windX,
@@ -105,7 +127,21 @@ export class Particle {
     
 
     public update(deltaTime: number) {
-        if(this.isDead) return;
+        if(this.isDead) {
+            const currentMaterial = this.model.getMaterial();
+            const newAlpha = currentMaterial.alpha - 0.001;
+            if(newAlpha <= 0) {
+                // Remove model from scene and particle system
+                this.notifyObservers();
+                return;
+            }
+            this.model.setMaterial({
+                ...currentMaterial,
+                alpha: newAlpha,
+            });
+            // Don't update movement for collided particles
+            if(this.collided) return;
+        }
         // Orbit movement
         const toCenter = vec3.subtract(vec3.create(), this.centerPoint, this.position);
         const toCenterNormalized = vec3.normalize(vec3.create(), toCenter);
@@ -137,6 +173,10 @@ export class Particle {
         }
         this.model.setTranslation(vec3.fromValues(this.position[0], 0, this.position[2]));
         vec3.set(this.acceleration, 0, 0, 0);
+        this.lifeTime -= 1;
+        if(!this.isDead && this.lifeTime < 0) {
+            this.kill();
+        }
     }
     
 
@@ -171,7 +211,8 @@ export class Particle {
         return xIntersect > 0 && yIntersect > 0 && zIntersect > 0;
     }
 
-    public kill() {
+    public kill(collided = false) {
         this.isDead = true;
+        this.collided = collided;
     }
 }

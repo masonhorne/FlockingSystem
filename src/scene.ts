@@ -2,8 +2,10 @@ import { mat4 } from "gl-matrix";
 import { Camera } from "./camera";
 import { Drawable, processDrawable, ProcessedDrawable } from "./model/drawable";
 import { Light } from "./model/light";
+import { ParticleSystemObserver } from "./particles/observers/particlesystemobserver";
+import { Particle } from "./particles/particle";
 
-export class Scene {
+export class Scene implements ParticleSystemObserver {
     private gl: WebGLRenderingContext;
     private objects: ProcessedDrawable[] = [];
     private lights: Light[] = [];
@@ -76,6 +78,14 @@ export class Scene {
         if (index > -1) {
             this.objects.splice(index, 1);
         }
+    }
+
+    public addParticle(particle: Particle): void {
+        this.addObject(particle.getModel());
+    }
+    
+    public removeParticle(particle: Particle): void {
+        this.removeObject(particle.getModel());
     }
   
     private setupShaders(): void {

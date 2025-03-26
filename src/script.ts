@@ -59,17 +59,29 @@ const light2 = {
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
 var scene = new Scene(canvas, camera);
+var particleSystem: ParticleSystem | undefined;
 
 function resetSceneCallback() {
+    if(particleSystem) {
+        const existingParticles = particleSystem.getParticles();
+        existingParticles.forEach(particle => {
+            particle.removeObserver(particleSystem!);
+        });
+        particleSystem.removeObserver(scene);
+    }
     scene.destroy();
     scene = new Scene(canvas, camera);
     scene.addLight(light);
     scene.addLight(light2);
     scene.addObject(floor);
     scene.addObject(sun);
-    const particleSystem = new ParticleSystem(50, center);
+    particleSystem = new ParticleSystem(50, center);
     const particles = particleSystem.getParticles();
-    particles.forEach(particle => scene.addObject(particle.getModel()));
+    particles.forEach(particle => {
+        scene.addObject(particle.getModel());
+        particle.addObserver(particleSystem!);
+    });
+    particleSystem.addObserver(scene);
 }
 
 resetSceneCallback();
