@@ -4,6 +4,7 @@ import { Floor } from './model/floor';
 import { Planet } from './model/planet';
 import { ParticleSystem } from './particles/particlesystem';
 import { Scene } from './scene';
+import { Settings } from './settings';
 import { UiHandler } from './uihandler';
 
 const center = vec3.fromValues(0, 1, 0);
@@ -60,6 +61,7 @@ const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
 var scene = new Scene(canvas, camera);
 var particleSystem: ParticleSystem | undefined;
+var settings = Settings.getInstance();
 
 function resetSceneCallback() {
     if(particleSystem) {
@@ -75,7 +77,8 @@ function resetSceneCallback() {
     scene.addLight(light2);
     scene.addObject(floor);
     scene.addObject(sun);
-    particleSystem = new ParticleSystem(50, center);
+    particleSystem?.stop();
+    particleSystem = new ParticleSystem(settings.getSettings().totalParticles, center);
     const particles = particleSystem.getParticles();
     particles.forEach(particle => {
         scene.addObject(particle.getModel());

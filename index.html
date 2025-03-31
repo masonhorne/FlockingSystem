@@ -28,6 +28,14 @@
                         min="0.0001" max="0.1" step="0.0001" value="0.001" id="maxSpeedSlider">
                 </div>
             </div>
+            <div class="setting">
+                <h2 class="setting-label">Total Particles</h2>
+                <span class="setting-value" id="totalParticlesValue">25</span>
+                <div>
+                    <input class="range" type="range" name="totalParticles" 
+                        min="1" max="1000" step="1" value="25" id="totalParticlesSlider">
+                </div>
+            </div>
             <div class="wind-settings">
                 <div class="setting">
                     <h2 class="setting-label">Wind (x-axis)</h2>
@@ -45,10 +53,6 @@
                     </div>
                     <span class="setting-value" id="windZValue">0</span>
                 </div>
-            </div>
-            <div class="setting">
-                <h2 class="setting-label">Upload Custom Model (.obj)</h2>
-                <input type="file" class="file-input" id="objFileUpload" accept=".obj" />
             </div>
         </div>
         <canvas id="canvas" width="512" height="512"></canvas>
@@ -94,6 +98,10 @@
                     </label>
                     <span>Enable collisions</span>
                 </div>  
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Upload Custom Model (.obj)</h2>
+                <input type="file" class="file-input" id="objFileUpload" accept=".obj" />
             </div>
         </div>
     </div>

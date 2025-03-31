@@ -84,6 +84,12 @@ export class UiHandler {
             }
             return value.toString();
         });
+        this.setupSlider("totalParticlesSlider", "totalParticlesValue", (value) => {
+            const lastValue = this.settings.getSettings().totalParticles;
+            this.settings.getSettings().totalParticles = value;
+            if(lastValue !== value) this.resetSceneCallback();
+            return value.toString();
+        });
     }
 
     private setupSlider(sliderId: string, valueId: string, onChange: (value: number) => string) {

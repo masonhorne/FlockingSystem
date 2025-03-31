@@ -13,6 +13,8 @@ export class ParticleSystem implements ParticleObserver {
     private observers: ParticleSystemObserver[] = [];
     private totalParticles: number;
 
+    private animationFrameId: number | undefined;
+
     constructor(totalParticles: number, centerPoint: vec3) {
         this.centerPoint = centerPoint;
         this.totalParticles = totalParticles;
@@ -24,7 +26,7 @@ export class ParticleSystem implements ParticleObserver {
         const deltaTime = currentTime - this.lastAnimationTime;
         this.lastAnimationTime = currentTime;
         this.update(deltaTime);
-        requestAnimationFrame(this.animate.bind(this));
+        this.animationFrameId = requestAnimationFrame(this.animate.bind(this));
     }
 
     public addObserver(observer: ParticleSystemObserver): void {
@@ -107,6 +109,12 @@ export class ParticleSystem implements ParticleObserver {
         }
         for(const particle of this.particles) {
             particle.update(deltaTime);
+        }
+    }
+
+    public stop(): void {
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
         }
     }
 }

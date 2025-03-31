@@ -12,6 +12,7 @@ type SettingsValue = {
     randomSize: boolean;
     randomColor: boolean;
     particleCollisions: boolean;
+    totalParticles: number;
 }
 
 export const DEFAULT_GRAVITATIONAL_COEFFICIENT = 6.67430e-10;
@@ -32,6 +33,7 @@ export class Settings {
         randomSize: true,
         randomColor: true,
         particleCollisions: false,
+        totalParticles: 25,
     };
 
     private constructor() {}
