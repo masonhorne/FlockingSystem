@@ -4,11 +4,7 @@ import { Obj } from "../model/obj";
 import { Planet } from "../model/planet";
 import { Settings } from "../settings";
 import { ParticleObserver } from "./observers/particleobserver";
-
-const MASS_OF_SUN = 10;
-const WIND_WEIGHT = 100;
-const ORBIT_WEIGHT = 1000000;
-const MAX_DISTANCE = 5;
+import { MASS_OF_SUN, MAX_DISTANCE, ORBIT_WEIGHT, WIND_WEIGHT } from "./particleconstants";
 
 export class Particle {
     private position: vec3;
@@ -42,7 +38,7 @@ export class Particle {
         const volume = 4 / 3 * Math.PI * Math.pow(this.radius, 3);
         const density = Math.random();
         this.mass = volume * density;
-        this.lifeTime = 1000 + Math.random() * 10000 * this.mass;
+        this.lifeTime = 1000 + Math.random() * 10000 * this.getMass();
         this.setupModel(this.position, radius);
     }
 

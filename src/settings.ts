@@ -13,6 +13,8 @@ type SettingsValue = {
     randomColor: boolean;
     particleCollisions: boolean;
     totalParticles: number;
+    yPlane: number;
+    dropGravityWell: boolean;
 }
 
 export const DEFAULT_GRAVITATIONAL_COEFFICIENT = 6.67430e-10;
@@ -34,6 +36,8 @@ export class Settings {
         randomColor: true,
         particleCollisions: false,
         totalParticles: 25,
+        yPlane: 1,
+        dropGravityWell: true,
     };
 
     private constructor() {}

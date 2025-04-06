@@ -52,6 +52,14 @@ export class ParticleSystem implements ParticleObserver {
         return new Particle(position, radius, this.centerPoint);
     }
 
+    public addParticle(particle: Particle): void {
+        this.particles.push(particle);
+        particle.addObserver(this);
+        for (const observer of this.observers) {
+            observer.addParticle(particle);
+        }
+    }
+
     private generateParticles(
         totalParticles: number,
     ): Particle[] {

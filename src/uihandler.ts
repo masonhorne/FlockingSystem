@@ -2,23 +2,44 @@ import { vec3 } from "gl-matrix";
 import { Camera } from "./camera";
 import { debounce } from './debounce';
 import { ObjProcessor } from "./model/objprocessor";
+import { RayTracer } from "./raytracer";
 import { DEFAULT_PARTICLE_COLOR, DEFAULT_PARTICLE_SIZE, Settings } from "./settings";
 
 export class UiHandler {
     private settings: Settings;
     private camera: Camera;
+    private rayTracer: RayTracer;
     private resetSceneCallback: () => void;
+    private dropObjectCallback: (position: vec3) => void;
 
-    constructor(camera: Camera, resetSceneCallback: () => void) {
+    constructor(camera: Camera, resetSceneCallback: () => void, dropObjectCallback: (position: vec3) => void) {
         this.settings = Settings.getInstance();
         this.camera = camera;
+        this.rayTracer = new RayTracer(camera);
         this.resetSceneCallback = debounce(resetSceneCallback, 100);
+        this.dropObjectCallback = dropObjectCallback;
         this.initializeSliders();
         this.initializeKeyControls();
         this.initializeObjUpload();
         this.initializeColorPicker();
         this.initializeButtons();
         this.initializeCheckboxes();
+        this.initializeClickHandler();
+    }
+
+    private initializeClickHandler() {
+        const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+        if(canvas) {
+            canvas.addEventListener('click', (event) => {
+                if(this.settings.getSettings().dropGravityWell) {
+                    const intersection = this.rayTracer.computeClickIntersection(event);
+                    if(intersection){
+                        const intersectionPoint = vec3.fromValues(intersection[0], intersection[1], intersection[2]);
+                        this.dropObjectCallback(intersectionPoint);
+                    }
+                }
+            })
+        }
     }
 
     private initializeButtons() {
@@ -52,6 +73,9 @@ export class UiHandler {
         this.setupCheckbox('collisionsCheckbox', (checked) => {
             this.settings.getSettings().particleCollisions = checked;
             this.resetSceneCallback();
+        });
+        this.setupCheckbox('gravityWellCheckbox', (checked) => {
+            this.settings.getSettings().dropGravityWell = checked;
         });
     }
 

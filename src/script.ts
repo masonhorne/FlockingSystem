@@ -2,12 +2,14 @@ import { vec3 } from 'gl-matrix';
 import { Camera } from './camera';
 import { Floor } from './model/floor';
 import { Planet } from './model/planet';
+import { GravityWell } from './particles/gravitywell';
 import { ParticleSystem } from './particles/particlesystem';
 import { Scene } from './scene';
 import { Settings } from './settings';
 import { UiHandler } from './uihandler';
 
-const center = vec3.fromValues(0, 1, 0);
+var settings = Settings.getInstance();
+const center = vec3.fromValues(0, settings.getSettings().yPlane, 0);
 
 const floor = new Floor(
     vec3.fromValues(-10, 0, -10),
@@ -61,7 +63,6 @@ const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
 var scene = new Scene(canvas, camera);
 var particleSystem: ParticleSystem | undefined;
-var settings = Settings.getInstance();
 
 function resetSceneCallback() {
     if(particleSystem) {
@@ -87,5 +88,26 @@ function resetSceneCallback() {
     particleSystem.addObserver(scene);
 }
 
+function dropObjectCallback(position: vec3) {
+    const black = vec3.fromValues(0, 0, 0);
+    const faintGlow = vec3.fromValues(0.1, 0.1, 0.2);
+    const planet = new Planet(
+        position,
+        1,
+        black,
+        black,
+        faintGlow,
+        10,
+        1,
+        undefined,
+    );
+    const particle = new GravityWell(
+        position,
+        1,
+        center
+    )
+    particleSystem?.addParticle(particle);
+}
+
 resetSceneCallback();
-const uiHandler = new UiHandler(camera, resetSceneCallback);
+const uiHandler = new UiHandler(camera, resetSceneCallback, dropObjectCallback);
