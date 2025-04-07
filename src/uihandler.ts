@@ -20,6 +20,7 @@ export class UiHandler {
         this.dropObjectCallback = dropObjectCallback;
         this.initializeSliders();
         this.initializeKeyControls();
+        this.initializeScrollHandler();
         this.initializeObjUpload();
         this.initializeColorPicker();
         this.initializeButtons();
@@ -153,6 +154,35 @@ export class UiHandler {
                 case "D": this.camera.tiltRight(); break;
             }
         });
+    }
+
+    private initializeScrollHandler() {
+        const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+        if (canvas) {
+            canvas.addEventListener('wheel', (event) => {
+                event.preventDefault();
+                const deltaY = event.deltaY;
+                const deltaX = event.deltaX;
+                if (event.ctrlKey) {
+                    if (deltaY > 0) {
+                        this.camera.moveBackward();
+                    } else if (deltaY < 0) {
+                        this.camera.moveForward();
+                    }
+                } else {
+                    if (deltaY > 0) {
+                        this.camera.moveDown();
+                    } else if (deltaY < 0) {
+                        this.camera.moveUp();
+                    }
+                    if (deltaX > 0) {
+                        this.camera.moveRight();
+                    } else if (deltaX < 0) {
+                        this.camera.moveLeft();
+                    }
+                }
+            }, { passive: false });
+        }
     }
 
     private initializeObjUpload() {

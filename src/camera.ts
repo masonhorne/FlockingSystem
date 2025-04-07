@@ -70,6 +70,22 @@ export class Camera {
     this.updateViewMatrix();
   }
 
+  public moveUp() {
+    const upMove = vec3.create();
+    vec3.scale(upMove, this.up, this.speed);
+    vec3.add(this.position, this.position, upMove);
+    vec3.add(this.target, this.target, upMove);
+    this.updateViewMatrix();
+  }
+  
+  public moveDown() {
+    const downMove = vec3.create();
+    vec3.scale(downMove, this.up, this.speed);
+    vec3.sub(this.position, this.position, downMove);
+    vec3.sub(this.target, this.target, downMove);
+    this.updateViewMatrix();
+  }
+  
   public moveLeft() {
     const forward = vec3.create();
     vec3.sub(forward, this.target, this.position);
@@ -89,7 +105,6 @@ export class Camera {
     vec3.add(this.position, vec3.clone(this.position), vec3.scale(forward, viewRight, this.speed));
     this.updateViewMatrix();
   }
-
 
   public tiltUp() {
     const forward = vec3.create();
