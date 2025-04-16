@@ -14,6 +14,7 @@ export class GravityWell extends Particle {
             diffuse: black,
             specular: black,
             ambient: faintGlow,
+            texturePath: undefined,
         });
     }
 

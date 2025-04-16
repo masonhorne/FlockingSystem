@@ -37,7 +37,7 @@ export class Settings {
         particleCollisions: false,
         totalParticles: 25,
         yPlane: 1,
-        dropGravityWell: true,
+        dropGravityWell: false,
     };
 
     private constructor() {}

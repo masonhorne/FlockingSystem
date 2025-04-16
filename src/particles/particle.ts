@@ -2,6 +2,7 @@ import { vec3 } from "gl-matrix";
 import { Drawable } from "../model/drawable";
 import { Obj } from "../model/obj";
 import { Planet } from "../model/planet";
+import { TextureFactory } from "../model/texturefactory";
 import { Settings } from "../settings";
 import { ParticleObserver } from "./observers/particleobserver";
 import { MASS_OF_SUN, MAX_DISTANCE, ORBIT_WEIGHT, WIND_WEIGHT } from "./particleconstants";
@@ -60,6 +61,7 @@ export class Particle {
                 undefined,
             )
         } else {
+            const randomTexture = TextureFactory.getRandomTexture();
             this.model = new Planet(
                 position,
                 radius,
@@ -68,7 +70,7 @@ export class Particle {
                 color,
                 10,
                 1,
-                undefined,
+                randomTexture,
             );
         }
         // Find the bounds for the particle based on the models vertices

@@ -1,4 +1,31 @@
+/**
+ * Class containing static functions for selecting texture and loading them into WebGL
+ */
 export class TextureFactory {
+
+    /**
+     * List of available textures for planets
+     * these textures were downloaded from https://www.solarsystemscope.com/textures/
+     */
+    private static availableTextures: string[] = [
+        "src/assets/jupiter.jpg",
+        "src/assets/mars.jpg",
+        "src/assets/moon.jpg",
+        "src/assets/neptune.jpg",
+        "src/assets/saturn.jpg",
+        "src/assets/uranus.jpg",
+        "src/assets/venus.jpg",
+    ];
+
+    /**
+     * Helper for randomly assigning a planet a texture
+     * @returns A random texture path from the available textures
+     */
+    static getRandomTexture() {
+        const randomIndex = Math.floor(Math.random() * this.availableTextures.length);
+        return this.availableTextures[randomIndex];
+    }
+
     /**
      * Create a texture from the given path
      * @param gl WebGLRenderContext for creating the texture
