@@ -5,7 +5,7 @@ import { Planet } from "../model/planet";
 import { TextureFactory } from "../model/texturefactory";
 import { Settings } from "../settings";
 import { ParticleObserver } from "./observers/particleobserver";
-import { MASS_OF_SUN, MAX_DISTANCE, ORBIT_WEIGHT, WIND_WEIGHT } from "./particleconstants";
+import { MASS_OF_SUN, MAX_DISTANCE, ORBIT_WEIGHT, ROTATION_DENOMINATOR, WIND_WEIGHT } from "./particleconstants";
 
 export class Particle {
     private position: vec3;
@@ -170,6 +170,7 @@ export class Particle {
             }
         }
         this.model.setTranslation(vec3.fromValues(this.position[0], 0, this.position[2]));
+        this.model.rotate(vec3.fromValues(0, 1, 0), Math.PI / ROTATION_DENOMINATOR * (this.reverse ? -1 : 1));    
         vec3.set(this.acceleration, 0, 0, 0);
         this.lifeTime -= 1;
         if(!this.isDead && this.lifeTime < 0) {

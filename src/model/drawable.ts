@@ -62,6 +62,12 @@ export abstract class Drawable {
     setTranslation(translation: vec3) {
         this.translation = translation;
     }
+    rotate(axis: vec3, angleInRadians: number) {
+        const rotationMatrix = mat4.create();
+        mat4.fromRotation(rotationMatrix, angleInRadians, axis);
+        vec3.transformMat4(this.xAxis, this.xAxis, rotationMatrix);
+        vec3.transformMat4(this.yAxis, this.yAxis, rotationMatrix);
+    }
     getTranslation(): vec3 {
         return this.translation;
     }
@@ -115,8 +121,7 @@ export class ProcessedDrawable {
         return this.drawable.getModelMatrix();
     }
     setTranslation(translation: vec3) {
-        this.drawable.setTranslation(translation
-        );
+        this.drawable.setTranslation(translation);
     }
     getTranslation(): vec3 {
         return this.drawable.getTranslation();
