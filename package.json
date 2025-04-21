@@ -4,8 +4,8 @@
   "main": "script.js",
   "scripts": {
     "start": "NODE_ENV=development webpack --watch",
-    "copy-files": "cp index.html dist/index.html && cp style.css dist/style.css",
-    "update-path": "sed -i 's|dist/script.js|script.js|g' dist/index.html",
+    "copy-files": "cp index.html dist/index.html && cp style.css dist/style.css && mkdir dist/assets && cp src/assets/* dist/assets/",
+    "update-path": "sed -i 's|dist/script.js|script.js|g' dist/index.html && sed -i 's|src/assets/|assets/|g' dist/script.js",
     "setup-files": "npm run copy-files && npm run update-path",
     "build": "NODE_ENV=production webpack && npm run setup-files",
     "deploy": "gh-pages -d dist"
