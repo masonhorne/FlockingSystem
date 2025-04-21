@@ -17,7 +17,7 @@ type SettingsValue = {
     dropGravityWell: boolean;
 }
 
-export const DEFAULT_GRAVITATIONAL_COEFFICIENT = 6.67430e-10;
+export const DEFAULT_GRAVITATIONAL_COEFFICIENT = 6.67430e-1;
 export const DEFAULT_PARTICLE_SIZE = 0.2;
 export const DEFAULT_PARTICLE_COLOR = vec3.fromValues(1, 1, 1);
 
