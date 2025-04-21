@@ -8,7 +8,6 @@ import { ParticleObserver } from "./observers/particleobserver";
 import { MASS_OF_SUN, MAX_DISTANCE, ORBIT_WEIGHT, ROTATION_DENOMINATOR, WIND_WEIGHT } from "./particleconstants";
 
 export class Particle {
-    private position: vec3;
     private velocity: vec3;
     private centerPoint: vec3;
     private acceleration: vec3;
@@ -25,7 +24,6 @@ export class Particle {
     private lifeTime: number;
 
     constructor(position: vec3, radius: number, centerPoint: vec3) {
-        this.position = vec3.clone(position);
         this.radius = radius;
         this.centerPoint = centerPoint;
         const toSun = vec3.negate(vec3.create(), position);
@@ -40,10 +38,11 @@ export class Particle {
         const density = Math.random();
         this.mass = volume * density;
         this.lifeTime = 1000 + Math.random() * 10000 * this.getMass();
-        this.setupModel(this.position, radius);
+        this.setupModel(position, radius);
     }
 
     private setupModel(position: vec3, radius: number) {
+        const initialPosition = vec3.fromValues(0, 0, 0);
         const color = this.settings.getSettings().randomColor ?
             vec3.fromValues(Math.random(), Math.random(), Math.random())
             : this.settings.getSettings().particleColor;
@@ -52,7 +51,7 @@ export class Particle {
             this.model = new Obj(
                 objData,
                 radius * 10,
-                position,
+                initialPosition,
                 color,
                 color,
                 color,
@@ -63,7 +62,7 @@ export class Particle {
         } else {
             const randomTexture = TextureFactory.getRandomTexture();
             this.model = new Planet(
-                position,
+                initialPosition,
                 radius,
                 color,
                 color,
@@ -73,6 +72,7 @@ export class Particle {
                 randomTexture,
             );
         }
+        this.model.setTranslation(position);
         // Find the bounds for the particle based on the models vertices
         const vertices = this.model.getVertices();
         for (let i = 0; i < vertices.length; i += 3) {
@@ -85,7 +85,7 @@ export class Particle {
     public applyGravity(other: Particle | vec3) {
         const isParticle = other instanceof Particle;
         const otherPosition = isParticle ? other.getPosition() : other;
-        const direction = vec3.subtract(vec3.create(), otherPosition, this.position);
+        const direction = vec3.subtract(vec3.create(), otherPosition, this.getPosition());
         const distance = vec3.length(direction);
         if(distance < 1) return;
         vec3.normalize(direction, direction);
@@ -141,7 +141,7 @@ export class Particle {
             if(this.collided) return;
         }
         // Orbit movement
-        const toCenter = vec3.subtract(vec3.create(), this.centerPoint, this.position);
+        const toCenter = vec3.subtract(vec3.create(), this.centerPoint, this.getPosition());
         const toCenterNormalized = vec3.normalize(vec3.create(), toCenter);
         const tangent = vec3.cross(vec3.create(), toCenterNormalized, vec3.fromValues(0, 1, 0));
         if(this.reverse) vec3.negate(tangent, tangent);
@@ -161,15 +161,16 @@ export class Particle {
             vec3.normalize(this.velocity, this.velocity);
             vec3.scale(this.velocity, this.velocity, maxSpeed);
         }
+        const position = vec3.clone(this.getPosition());
         const positionChange = vec3.scale(vec3.create(), this.velocity, deltaTime);
-        vec3.add(this.position, this.position, positionChange);
+        vec3.add(position, position, positionChange);
         for (let i of [0, 2]) {
-            if (this.position[i] < -MAX_DISTANCE || this.position[i] > MAX_DISTANCE) {
-                this.position[i] = Math.max(-MAX_DISTANCE, Math.min(MAX_DISTANCE, this.position[i]));
+            if (position[i] < -MAX_DISTANCE || position[i] > MAX_DISTANCE) {
+                position[i] = Math.max(-MAX_DISTANCE, Math.min(MAX_DISTANCE, position[i]));
                 this.velocity[i] = 0;
             }
         }
-        this.model.setTranslation(vec3.fromValues(this.position[0], 0, this.position[2]));
+        this.model.setTranslation(position);
         this.model.rotate(vec3.fromValues(0, 1, 0), Math.PI / ROTATION_DENOMINATOR * (this.reverse ? -1 : 1));    
         vec3.set(this.acceleration, 0, 0, 0);
         this.lifeTime -= 1;
@@ -184,7 +185,7 @@ export class Particle {
     }
 
     public getPosition(): vec3 {
-        return this.position;
+        return this.model.getTranslation();
     }
 
     public getMass(): number {
@@ -192,7 +193,7 @@ export class Particle {
     }
 
     public getBounds() {
-        const translation = vec3.fromValues(this.position[0], this.position[1], this.position[2]);
+        const translation = this.model.getTranslation();
         const worldSpaceMin = vec3.add(vec3.create(), this.minBounds, translation);
         const worldSpaceMax = vec3.add(vec3.create(), this.maxBounds, translation);
         return {

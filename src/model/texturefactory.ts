@@ -11,7 +11,6 @@ export class TextureFactory {
         "src/assets/jupiter.jpg",
         "src/assets/mars.jpg",
         "src/assets/moon.jpg",
-        "src/assets/neptune.jpg",
         "src/assets/saturn.jpg",
         "src/assets/uranus.jpg",
         "src/assets/venus.jpg",
