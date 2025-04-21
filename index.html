@@ -3,14 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Particle Simulation</title>
+    <title>Flocking System</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Particle Simulation</h1>
+        <h1>Flocking System</h1>
     </header>
-    <canvas id="canvas"></canvas>
+    <div class="container">
+        <div class="settings">
+            <div class="setting">
+                <h2 class="setting-label">Gravity Coefficient</h2>
+                <span class="setting-value" id="gravityValue">0</span>
+                <div>
+                    <input class="range" type="range" name="gravity" 
+                        min="-10" max="10" step="0.1" value="0" id="gravitySlider">
+                </div>
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Max Speed</h2>
+                <span class="setting-value" id="maxSpeedValue">0</span>
+                <div>
+                    <input class="range" type="range" name="maxSpeed" 
+                        min="0.0001" max="0.1" step="0.0001" value="0.001" id="maxSpeedSlider">
+                </div>
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Total Particles</h2>
+                <span class="setting-value" id="totalParticlesValue">25</span>
+                <div>
+                    <input class="range" type="range" name="totalParticles" 
+                        min="1" max="1000" step="1" value="25" id="totalParticlesSlider">
+                </div>
+            </div>
+            <div class="wind-settings">
+                <div class="setting">
+                    <h2 class="setting-label">Wind (x-axis)</h2>
+                    <div class="vertical-slider-container">
+                        <input class="range vertical-slider" type="range" name="windX" 
+                            min="-10" max="10" step="0.1" value="0" id="windXSlider">
+                    </div>
+                    <span class="setting-value" id="windXValue">0</span>
+                </div>
+                <div class="setting">
+                    <h2 class="setting-label">Wind (z-axis)</h2>
+                    <div class="vertical-slider-container">
+                        <input class="range vertical-slider" type="range" name="windZ" 
+                            min="-10" max="10" step="0.1" value="0" id="windZSlider">
+                    </div>
+                    <span class="setting-value" id="windZValue">0</span>
+                </div>
+            </div>
+        </div>
+        <canvas id="canvas" width="512" height="512"></canvas>
+        <div class="settings">
+            <div class="setting">
+                <h2 class="setting-label">Particle Color</h2>
+                <div class="resetable-slider-value">
+                    <input class="color-input" type="color" id="particleColor" value="#FFFFFF">
+                    <button class="btn" id="clearColorBtn">Clear color</button>
+                </div>
+                <div class="checkbox-wrapper">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="randomColorCheckbox" checked>
+                      <div class="checkmark"></div>
+                    </label>
+                    <span>Random color</span>
+                </div>
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Particle Size</h2>
+                <div class="resetable-slider-value">
+                    <span class="setting-value" id="particleSizeValue">0</span>
+                    <button class="btn" id="clearSizeBtn">Clear size</button>
+                </div>
+                <div>
+                    <input class="range" type="range" name="particleSize" 
+                        min="0.01" max="1" step="0.01" value="0.2" id="particleSizeSlider">
+                </div>
+                <div class="checkbox-wrapper">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="randomSizeCheckbox" checked>
+                      <div class="checkmark"></div>
+                    </label>
+                    <span>Random size</span>
+                </div>
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Particle Collisions</h2>
+                <div class="checkbox-wrapper">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="collisionsCheckbox">
+                      <div class="checkmark"></div>
+                    </label>
+                    <span>Enable collisions</span>
+                </div>  
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Upload Custom Model (.obj)</h2>
+                <input type="file" class="file-input" id="objFileUpload" accept=".obj" />
+            </div>
+            <div class="setting">
+                <h2 class="setting-label">Drop Gravity Well</h2>
+                <div class="checkbox-wrapper">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="gravityWellCheckbox">
+                      <div class="checkmark"></div>
+                    </label>
+                    <span>Enable gravity wells</span>
+                </div>  
+            </div>
+        </div>
+    </div>
     <script type="module" src="script.js"></script>
 </body>
 </html>

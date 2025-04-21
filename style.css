@@ -27,5 +27,217 @@ h1 {
 #canvas {
     border: 1px solid white;
     display: block;
+    margin: 0 64px;
+}
+
+.container {
+    display: flex;
+    align-items: start;
+}
+
+.settings {
+    margin: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.setting {
+    margin: 8px 0;
+}
+
+.setting-value {
+    text-align: center;
+    font-size: 2em;
+    color: #999;
+    font-weight: 400;
+}
+
+.resetable-slider-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 4px 0;
+}
+
+.range {
+    width: 100%;
+    height: 15px;
+    appearance: none;
+    background: #111;
+    outline: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 1);
+}
+
+.range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #d3d3d3;
+    cursor: pointer;
+    border: 4px solid #333;
+    box-shadow: -407px 0 0 400px #d3d3d3;
+}
+
+.vertical-slider {
+    transform: rotate(270deg) translateX(-68px);
     margin: 0 auto;
+}
+
+.vertical-slider-container { 
+    height: 150px;
+}
+
+.wind-settings {
+    display: flex;
+    flex-direction: row;
+    margin-top: 8px;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.wind-settings > .setting {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.file-input {
+    margin-top: 4px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.file-input::file-selector-button {
+    border-radius: 3px;
+    padding: 0 16px;
+    height: 40px;
+    cursor: pointer;
+    background-color: rgb(139, 130, 130);
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+    color: white;
+    margin-right: 16px;
+    transition: background-color 200ms;
+}
+  
+.file-input::file-selector-button:hover {
+    background-color: rgb(100, 95, 95);
+}
+  
+.file-input::file-selector-button:active {
+    background-color: #e5e7eb;
+}
+
+.color-input {
+    height: 20px;
+    width: 20px;
+    border: none;
+    border-radius: 50%;
+    overflow: hidden;
+    padding: 0;
+    cursor: pointer;
+}
+
+.color-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+.color-input::-moz-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+.color-container {
+    display: flex;
+    align-items: center;
+}
+
+.btn {
+    margin-left: 8px;
+    border-radius: 3px;
+    padding: 0 16px;
+    height: 40px;
+    cursor: pointer;
+    background-color: rgb(139, 130, 130);
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+    color: white;
+    margin-right: 16px;
+    transition: background-color 200ms;
+}
+
+.btn:hover {
+    background-color: rgb(100, 95, 95);
+}
+
+.btn:active {
+    background-color: #e5e7eb;
+}
+
+
+.checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.checkbox-wrapper span {
+    margin-left: 8px;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  visibility: hidden;
+  display: none;
+}
+
+.checkbox-wrapper .checkbox-container {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  font-size: 20px;
+  user-select: none;
+}
+
+.checkbox-wrapper .checkmark {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 1.3em;
+  width: 1.3em;
+  background-color: #504949;
+  border-radius: 100%;
+  background: #232323;
+  box-shadow: 3px 3px 5px #1d1d1d,
+              -3px -3px 5px #070606;
+}
+
+.checkbox-wrapper .checkmark:after {
+  content: "";
+  position: absolute;
+  opacity: 0;
+}
+
+.checkbox-wrapper .checkbox-container input:checked ~ .checkmark:after {
+  opacity: 1;
+}
+
+.checkbox-wrapper .checkbox-container .checkmark:after {
+  left: 0.45em;
+  top: 0.25em;
+  width: 0.25em;
+  height: 0.5em;
+  border: solid darkgray;
+  border-width: 0 0.15em 0.15em 0;
+  transform: rotate(45deg);
+  transition: all 250ms;
 }
