@@ -5,7 +5,7 @@ import { Planet } from "../model/planet";
 import { TextureFactory } from "../model/texturefactory";
 import { Settings } from "../settings";
 import { ParticleObserver } from "./observers/particleobserver";
-import { MASS_OF_SUN, MAX_DISTANCE, ORBIT_WEIGHT, ROTATION_DENOMINATOR, WIND_WEIGHT } from "./particleconstants";
+import { MASS_OF_SUN, ORBIT_WEIGHT, ROTATION_DENOMINATOR, WIND_WEIGHT } from "./particleconstants";
 
 export class Particle {
     private velocity: vec3;
@@ -164,12 +164,6 @@ export class Particle {
         const position = vec3.clone(this.getPosition());
         const positionChange = vec3.scale(vec3.create(), this.velocity, deltaTime);
         vec3.add(position, position, positionChange);
-        for (let i of [0, 2]) {
-            if (position[i] < -MAX_DISTANCE || position[i] > MAX_DISTANCE) {
-                position[i] = Math.max(-MAX_DISTANCE, Math.min(MAX_DISTANCE, position[i]));
-                this.velocity[i] = 0;
-            }
-        }
         this.model.setTranslation(position);
         this.model.rotate(vec3.fromValues(0, 1, 0), Math.PI / ROTATION_DENOMINATOR * (this.reverse ? -1 : 1));    
         vec3.set(this.acceleration, 0, 0, 0);
